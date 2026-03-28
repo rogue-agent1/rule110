@@ -1,8 +1,19 @@
 # rule110
-Elementary cellular automaton (Rule 110 / any rule 0-255). Zero dependencies.
+
+Rule 110 cellular automaton — Turing-complete 1D CA
+
 ## Usage
+
 ```bash
-python3 rule110.py -r 110 -w 80 -g 50
-python3 rule110.py -r 30   # Rule 30 (chaos)
-python3 rule110.py -r 90   # Rule 90 (Sierpinski)
+python3 rule110.py --help
 ```
+
+## Features
+
+- Single file, zero dependencies
+- Python 3.8+ compatible
+- CLI interface
+
+## License
+
+MIT

@@ -1,29 +1,32 @@
 #!/usr/bin/env python3
-"""Elementary cellular automaton (Rule 110 and others)."""
+"""Rule 110 — Turing-complete elementary cellular automaton."""
 import sys
 
-def step(cells, rule=110):
-    n = len(cells); new = [0]*n
-    for i in range(n):
-        pattern = (cells[(i-1)%n] << 2) | (cells[i] << 1) | cells[(i+1)%n]
-        new[i] = (rule >> pattern) & 1
-    return new
+def rule_table(rule_num):
+    return {tuple(int(b) for b in f"{i:03b}"): (rule_num >> i) & 1 for i in range(8)}
 
-def run(width=80, generations=40, rule=110, seed=None):
-    cells = [0]*width
-    if seed: 
-        for i in seed: cells[i % width] = 1
-    else:
-        cells[width-1] = 1
-    for g in range(generations):
-        print(''.join('█' if c else ' ' for c in cells))
-        cells = step(cells, rule)
+def simulate(width=80, steps=40, rule_num=110, init=None):
+    table = rule_table(rule_num)
+    if init is None:
+        state = [0]*width; state[-1] = 1
+    else: state = init
+    rows = [state[:]]
+    for _ in range(steps-1):
+        new = [0]*width
+        for i in range(width):
+            l = state[(i-1)%width]; c = state[i]; r = state[(i+1)%width]
+            new[i] = table[(l,c,r)]
+        state = new; rows.append(state[:])
+    return rows
 
-if __name__ == '__main__':
-    import argparse
-    p = argparse.ArgumentParser()
-    p.add_argument('-r', '--rule', type=int, default=110)
-    p.add_argument('-w', '--width', type=int, default=80)
-    p.add_argument('-g', '--generations', type=int, default=40)
-    args = p.parse_args()
-    run(args.width, args.generations, args.rule)
+def display(rows):
+    for row in rows: print("".join("█" if c else " " for c in row))
+
+def cli():
+    rule = int(sys.argv[1]) if len(sys.argv)>1 else 110
+    w = int(sys.argv[2]) if len(sys.argv)>2 else 80
+    steps = int(sys.argv[3]) if len(sys.argv)>3 else 40
+    print(f"Rule {rule} ({w}x{steps}):")
+    display(simulate(w, steps, rule))
+
+if __name__ == "__main__": cli()
